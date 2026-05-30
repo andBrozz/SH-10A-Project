@@ -1,28 +1,381 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silent Hill 2 | Главное меню</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silent Hill 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  background:#000;
+}
+
+/* ─────────────────────────────────────────────────
+   BACKGROUND
+   🔧 В теге <video> укажите src="путь/к/видео.mp4"
+   ───────────────────────────────────────────────── */
+#bg {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 68% 42%, #1a1510 0%, #090909 100%);
+  filter:brightness(.57) saturate(.42);
+  z-index:0;
+  overflow:hidden;
+}
+#bg video {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+
+/* ─────────────────────────────────────────────────
+   OVERLAYS
+   ───────────────────────────────────────────────── */
+
+/* Тёмная заливка слева */
+#fade-left {
+  position:absolute; inset:0;
+  background:linear-gradient(
+    to right,
+    rgba(0,0,0,.93) 0%,
+    rgba(0,0,0,.65) 19%,
+    rgba(0,0,0,.24) 38%,
+    transparent     58%
+  );
+  pointer-events:none; z-index:1;
+}
+
+/* Радиальная виньетка */
+#vignette {
+  position:absolute; inset:0;
+  background:radial-gradient(
+    ellipse 122% 112% at 66% 50%,
+    transparent    15%,
+    rgba(0,0,0,.30) 50%,
+    rgba(0,0,0,.92) 100%
+  );
+  pointer-events:none; z-index:2;
+}
+
+/* ─────────────────────────────────────────────────
+   ЗЕРНО (FILM GRAIN)
+   ───────────────────────────────────────────────── */
+#grain {
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:30;
+  opacity:.058;
+  mix-blend-mode:screen;
+}
+
+/* ─────────────────────────────────────────────────
+   МЕНЮ
+   ───────────────────────────────────────────────── */
+#menu {
+  position:absolute;
+  left:5.4vw;
+  top:48vh;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+
+/* Один пункт меню */
+.mi {
+  position:relative;
+  display:flex; align-items:center;
+  width:375px; height:56px;
+  padding:0 22px;
+  cursor:pointer; user-select:none;
+  overflow:hidden;
+}
+
+/* Canvas с живым красным фоном */
+.mi > canvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  opacity:0;
+  transition:opacity .38s ease;
+}
+
+/* Текст */
+.mi > span {
+  position:relative; z-index:2;
+  font-family:'Oswald','Arial Narrow',sans-serif;
+  font-size:1.78rem; font-weight:600;
+  letter-spacing:.17em; text-transform:uppercase;
+  color:rgba(255,255,255,.65);
+  transition:color .3s, text-shadow .3s;
+}
+
+/* ── Активный пункт ── */
+.mi.active > canvas { opacity:1; }
+
+.mi.active > span {
+  color:rgba(255,255,255,.97);
+  /* Хроматическая аберрация */
+  text-shadow:
+    -1.5px 0   0 rgba(218,14,5,.44),
+     1.5px 0   0 rgba(16,165,255,.27),
+     0     0  9px rgba(195,48,18,.18);
+}
+
+/* ─────────────────────────────────────────────────
+   FOOTER
+   ───────────────────────────────────────────────── */
+#footer {
+  position:absolute;
+  bottom:3.3vh; left:0; right:0;
+  z-index:10;
+}
+.f-copy {
+  position:absolute; left:50%; transform:translateX(-50%);
+  font-family:system-ui,sans-serif; font-size:.68rem;
+  letter-spacing:.07em; color:rgba(255,255,255,.27);
+  white-space:nowrap;
+}
+.f-ver {
+  position:absolute; right:2.5vw;
+  font-family:system-ui,sans-serif; font-size:.68rem;
+  letter-spacing:.07em; color:rgba(255,255,255,.27);
+}
+</style>
 </head>
-
 <body>
-    <div class="video-background">
-        <video id="bg-video" autoplay muted loop playsinline preload="auto">
-            <source src="video/SHW.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay"></div>
-    </div>
-    <div id="menu-wrap">
-        <aside class="menu-panel" aria-label="Главное меню">
-            <div class="brand-title">SILENT HILL</div>
-            <div class="panel-title">MENU</div>
-            <ul class="menu-list" role="menu"></ul>
-        </aside>
-    </div>
-    <script src="js/menu.js"></script>
-</body>
 
+<div id="bg">
+  <!-- 🔧 Замените src на путь к вашему видео -->
+  <video src="../html/video/SHW.mp4" autoplay loop muted playsinline></video>
+</div>
+<div id="fade-left"></div>
+<div id="vignette"></div>
+<canvas id="grain"></canvas>
+
+<nav id="menu">
+  <div class="mi"><canvas></canvas><span>Продолжить</span></div>
+  <div class="mi"><canvas></canvas><span>Новая игра</span></div>
+  <div class="mi"><canvas></canvas><span>Загрузить игру</span></div>
+  <div class="mi"><canvas></canvas><span>Настройки</span></div>
+  <div class="mi"><canvas></canvas><span>Создатели</span></div>
+  <div class="mi"><canvas></canvas><span>Выход</span></div>
+</nav>
+
+<div id="footer">
+  <span class="f-copy">© 2024 Konami Digital Entertainment</span>
+  <span class="f-ver">v. 1.1.258.834</span>
+</div>
+
+<script>'use strict';
+
+/* ═══════════════════════════════════════════════════════
+   VALUE NOISE + FBM
+   Быстрый плавный шум без таблиц перестановок
+   ═══════════════════════════════════════════════════════ */
+function hashN(x, y) {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return n - Math.floor(n); // [0, 1)
+}
+function smooth(t) { return t * t * (3 - 2 * t); }
+
+function vNoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi,        yf = y - yi;
+  const ux = smooth(xf),    uy = smooth(yf);
+  return hashN(xi,   yi  ) * (1-ux) * (1-uy)
+       + hashN(xi+1, yi  ) *    ux  * (1-uy)
+       + hashN(xi,   yi+1) * (1-ux) *    uy
+       + hashN(xi+1, yi+1) *    ux  *    uy;
+}
+
+// Фрактальный шум: 3 октавы
+function fbm(x, y) {
+  return vNoise(x,            y          ) * .55
+       + vNoise(x * 2.1 + 5, y * 2.1 - 3) * .28
+       + vNoise(x * 4.3 - 7, y * 4.3 + 2) * .17;
+  // Сумма весов = 1.0 → результат в [0, 1]
+}
+
+/* ═══════════════════════════════════════════════════════
+   FILM GRAIN (полноэкранный анимированный шум)
+   ═══════════════════════════════════════════════════════ */
+const gEl  = document.getElementById('grain');
+const gCtx = gEl.getContext('2d');
+let   gImg = null;
+
+function resizeGrain() {
+  gEl.width  = window.innerWidth;
+  gEl.height = window.innerHeight;
+  gImg = null; // сбросить кэш при ресайзе
+}
+resizeGrain();
+window.addEventListener('resize', resizeGrain, { passive: true });
+
+function renderGrain() {
+  const W = gEl.width, H = gEl.height;
+  if (!gImg) gImg = gCtx.createImageData(W, H);
+  // Uint32Array — пакуем RGBA за 1 операцию вместо 4
+  // Little-endian: байты [R,G,B,A] = u32 = R|(G<<8)|(B<<16)|(A<<24)
+  const u32 = new Uint32Array(gImg.data.buffer);
+  for (let i = 0; i < u32.length; i++) {
+    const v = Math.random() * 256 | 0;
+    u32[i] = v | (v << 8) | (v << 16) | (0xFF << 24);
+  }
+  gCtx.putImageData(gImg, 0, 0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   BLOOD TEXTURE ДЛЯ КНОПОК
+   Рендерим на маленьком canvas (80×24) → масштабируем.
+   Это в ~40x быстрее, чем рендерить в полном разрешении.
+   ═══════════════════════════════════════════════════════ */
+const BW = 80, BH = 24;
+const offC   = document.createElement('canvas');
+offC.width = BW; offC.height = BH;
+const offCtx = offC.getContext('2d');
+const nImg   = offCtx.createImageData(BW, BH);
+const nPx    = nImg.data; // переиспользуем буфер каждый кадр
+
+// Предвычисленное горизонтальное затухание — широкие нечёткие края
+const hEdge = new Float32Array(BW);
+for (let x = 0; x < BW; x++) {
+  const t = x / (BW - 1);
+  // Смягчённый cubic ease-in вместо линейного — более органичный переход
+  const rawL = Math.min(1, t       / 0.27);
+  const rawR = Math.min(1, (1 - t) / 0.22);
+  const easeL = rawL * rawL * (3 - 2 * rawL);
+  const easeR = rawR * rawR * (3 - 2 * rawR);
+  hEdge[x] = Math.min(easeL, easeR);
+}
+
+const items       = Array.from(document.querySelectorAll('.mi'));
+const btnCanvases = items.map(el => el.querySelector('canvas'));
+// Каждая кнопка "дышит" со своим сдвигом по времени
+const tOff        = items.map(() => Math.random() * 80);
+
+function renderBtn(canvas, t) {
+  let i = 0;
+  for (let y = 0; y < BH; y++) {
+    // vy: от -1 (верх) до +1 (низ)
+    const vy = (y / (BH - 1)) * 2 - 1;
+    // Вертикальный градиент: слегка ярче в центре
+    const vf = 0.76 + 0.24 * (1 - Math.abs(vy));
+
+    for (let x = 0; x < BW; x++) {
+      const nx = x * 0.12, ny = y * 0.12;
+
+      // Замедленный FBM — вдвое медленнее оригинала
+      let n  = fbm(nx +        t * .08,  ny +        t * .03);
+          n  = n * .65 + fbm(nx * 1.5 + t * .13 + 9,
+                             ny * 1.5 - t * .04 + 5) * .35;
+
+      // Пространственное затухание
+      n *= hEdge[x] * vf;
+
+      // Более тёмная палитра: почти чёрный → тёмно-кровавый
+      nPx[i++] = (13 + n *  66) | 0; // R
+      nPx[i++] = (     n *   8) | 0; // G
+      nPx[i++] = (     n *   5) | 0; // B
+      nPx[i++] = (124 + n *  54) | 0; // A
+    }
+  }
+
+  offCtx.putImageData(nImg, 0, 0);
+
+  const w = canvas.width, h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(offC, 0, 0, w, h);
+
+  // ── Красные границы сверху и снизу — нечёткие слева и справа ──
+  const pulse = 0.80 + Math.sin(t * 0.062) * 0.20; // медленная пульсация ~7 сек
+
+  // Горизонтальный градиент: тают к левому и правому краю
+  const bGrad = ctx.createLinearGradient(0, 0, w, 0);
+  bGrad.addColorStop(0,    'rgba(140,4,2,0)');
+  bGrad.addColorStop(0.06, `rgba(205,10,3,${0.84 * pulse})`);
+  bGrad.addColorStop(0.50, `rgba(230,15,4,${0.96 * pulse})`);
+  bGrad.addColorStop(0.94, `rgba(205,10,3,${0.84 * pulse})`);
+  bGrad.addColorStop(1,    'rgba(140,4,2,0)');
+
+  ctx.save();
+  ctx.shadowColor = `rgba(255,16,5,${0.55 * pulse})`;
+  ctx.shadowBlur  = 12;
+  ctx.strokeStyle = bGrad;
+  ctx.lineWidth   = 2;
+
+  /*// Верхняя граница
+  ctx.beginPath();
+  ctx.moveTo(0, 1);
+  ctx.lineTo(w, 1);
+  ctx.stroke();
+
+  // Нижняя граница
+  ctx.beginPath();
+  ctx.moveTo(0, h - 1);
+  ctx.lineTo(w, h - 1);
+  ctx.stroke();
+
+  ctx.restore();
+  */
+}
+
+/* ═══════════════════════════════════════════════════════
+   НАВИГАЦИЯ ПО МЕНЮ
+   ═══════════════════════════════════════════════════════ */
+let sel = 0;
+
+function selectItem(i) {
+  items[sel].classList.remove('active');
+  sel = ((i % items.length) + items.length) % items.length;
+  items[sel].classList.add('active');
+}
+
+selectItem(0);
+
+// Мышь
+items.forEach((el, i) => {
+  el.addEventListener('mouseenter', () => selectItem(i));
+});
+
+// Клавиатура
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); selectItem(sel + 1); }
+  if (e.key === 'ArrowUp')   { e.preventDefault(); selectItem(sel - 1); }
+});
+
+/* ═══════════════════════════════════════════════════════
+   ГЛАВНЫЙ ЦИКЛ
+   ═══════════════════════════════════════════════════════ */
+let animT = 0;
+
+function loop() {
+  renderGrain();
+  // Рендерим blood-текстуру только для активной кнопки
+  renderBtn(btnCanvases[sel], animT + tOff[sel]);
+  animT += 0.20;
+  requestAnimationFrame(loop);
+}
+
+// Инициализируем размеры canvas после отрисовки и загрузки шрифтов
+function init() {
+  btnCanvases.forEach(c => {
+    c.width  = c.parentElement.offsetWidth  || 375;
+    c.height = c.parentElement.offsetHeight || 56;
+  });
+  loop();
+}
+
+if (document.fonts?.ready) document.fonts.ready.then(init);
+else setTimeout(init, 120);
+</script>
+</body>
 </html>
