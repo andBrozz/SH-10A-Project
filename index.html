@@ -16,10 +16,6 @@ html, body {
   background:#000;
 }
 
-/* ─────────────────────────────────────────────────
-   BACKGROUND
-   🔧 В теге <video> укажите src="путь/к/видео.mp4"
-   ───────────────────────────────────────────────── */
 #bg {
   position:absolute; inset:0;
   background:radial-gradient(ellipse at 68% 42%, #1a1510 0%, #090909 100%);
@@ -34,11 +30,6 @@ html, body {
   object-position:center;
 }
 
-/* ─────────────────────────────────────────────────
-   OVERLAYS
-   ───────────────────────────────────────────────── */
-
-/* Тёмная заливка слева */
 #fade-left {
   position:absolute; inset:0;
   background:linear-gradient(
@@ -51,7 +42,6 @@ html, body {
   pointer-events:none; z-index:1;
 }
 
-/* Радиальная виньетка */
 #vignette {
   position:absolute; inset:0;
   background:radial-gradient(
@@ -63,9 +53,6 @@ html, body {
   pointer-events:none; z-index:2;
 }
 
-/* ─────────────────────────────────────────────────
-   ЗЕРНО (FILM GRAIN)
-   ───────────────────────────────────────────────── */
 #grain {
   position:absolute; inset:0;
   pointer-events:none;
@@ -74,9 +61,6 @@ html, body {
   mix-blend-mode:screen;
 }
 
-/* ─────────────────────────────────────────────────
-   МЕНЮ
-   ───────────────────────────────────────────────── */
 #menu {
   position:absolute;
   left:5.4vw;
@@ -87,7 +71,6 @@ html, body {
   gap:1px;
 }
 
-/* Один пункт меню */
 .mi {
   position:relative;
   display:flex; align-items:center;
@@ -97,7 +80,6 @@ html, body {
   overflow:hidden;
 }
 
-/* Canvas с живым красным фоном */
 .mi > canvas {
   position:absolute; inset:0;
   width:100%; height:100%;
@@ -105,7 +87,6 @@ html, body {
   transition:opacity .38s ease;
 }
 
-/* Текст */
 .mi > span {
   position:relative; z-index:2;
   font-family:'Oswald','Arial Narrow',sans-serif;
@@ -115,21 +96,16 @@ html, body {
   transition:color .3s, text-shadow .3s;
 }
 
-/* ── Активный пункт ── */
 .mi.active > canvas { opacity:1; }
 
 .mi.active > span {
   color:rgba(255,255,255,.97);
-  /* Хроматическая аберрация */
   text-shadow:
     -1.5px 0   0 rgba(218,14,5,.44),
      1.5px 0   0 rgba(16,165,255,.27),
      0     0  9px rgba(195,48,18,.18);
 }
 
-/* ─────────────────────────────────────────────────
-   FOOTER
-   ───────────────────────────────────────────────── */
 #footer {
   position:absolute;
   bottom:3.3vh; left:0; right:0;
@@ -151,7 +127,6 @@ html, body {
 <body>
 
 <div id="bg">
-  <!-- 🔧 Замените src на путь к вашему видео -->
   <video src="video/SHW.mp4" autoplay loop muted playsinline></video>
 </div>
 <div id="fade-left"></div>
@@ -174,13 +149,9 @@ html, body {
 
 <script>'use strict';
 
-/* ═══════════════════════════════════════════════════════
-   VALUE NOISE + FBM
-   Быстрый плавный шум без таблиц перестановок
-   ═══════════════════════════════════════════════════════ */
 function hashN(x, y) {
   const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
-  return n - Math.floor(n); // [0, 1)
+  return n - Math.floor(n);
 }
 function smooth(t) { return t * t * (3 - 2 * t); }
 
@@ -194,17 +165,12 @@ function vNoise(x, y) {
        + hashN(xi+1, yi+1) *    ux  *    uy;
 }
 
-// Фрактальный шум: 3 октавы
 function fbm(x, y) {
   return vNoise(x,            y          ) * .55
        + vNoise(x * 2.1 + 5, y * 2.1 - 3) * .28
        + vNoise(x * 4.3 - 7, y * 4.3 + 2) * .17;
-  // Сумма весов = 1.0 → результат в [0, 1]
 }
 
-/* ═══════════════════════════════════════════════════════
-   FILM GRAIN (полноэкранный анимированный шум)
-   ═══════════════════════════════════════════════════════ */
 const gEl  = document.getElementById('grain');
 const gCtx = gEl.getContext('2d');
 let   gImg = null;
@@ -212,7 +178,7 @@ let   gImg = null;
 function resizeGrain() {
   gEl.width  = window.innerWidth;
   gEl.height = window.innerHeight;
-  gImg = null; // сбросить кэш при ресайзе
+  gImg = null;
 }
 resizeGrain();
 window.addEventListener('resize', resizeGrain, { passive: true });
@@ -220,8 +186,7 @@ window.addEventListener('resize', resizeGrain, { passive: true });
 function renderGrain() {
   const W = gEl.width, H = gEl.height;
   if (!gImg) gImg = gCtx.createImageData(W, H);
-  // Uint32Array — пакуем RGBA за 1 операцию вместо 4
-  // Little-endian: байты [R,G,B,A] = u32 = R|(G<<8)|(B<<16)|(A<<24)
+  
   const u32 = new Uint32Array(gImg.data.buffer);
   for (let i = 0; i < u32.length; i++) {
     const v = Math.random() * 256 | 0;
@@ -230,23 +195,16 @@ function renderGrain() {
   gCtx.putImageData(gImg, 0, 0);
 }
 
-/* ═══════════════════════════════════════════════════════
-   BLOOD TEXTURE ДЛЯ КНОПОК
-   Рендерим на маленьком canvas (80×24) → масштабируем.
-   Это в ~40x быстрее, чем рендерить в полном разрешении.
-   ═══════════════════════════════════════════════════════ */
 const BW = 80, BH = 24;
 const offC   = document.createElement('canvas');
 offC.width = BW; offC.height = BH;
 const offCtx = offC.getContext('2d');
 const nImg   = offCtx.createImageData(BW, BH);
-const nPx    = nImg.data; // переиспользуем буфер каждый кадр
+const nPx    = nImg.data; 
 
-// Предвычисленное горизонтальное затухание — широкие нечёткие края
 const hEdge = new Float32Array(BW);
 for (let x = 0; x < BW; x++) {
   const t = x / (BW - 1);
-  // Смягчённый cubic ease-in вместо линейного — более органичный переход
   const rawL = Math.min(1, t       / 0.27);
   const rawR = Math.min(1, (1 - t) / 0.22);
   const easeL = rawL * rawL * (3 - 2 * rawL);
@@ -256,29 +214,23 @@ for (let x = 0; x < BW; x++) {
 
 const items       = Array.from(document.querySelectorAll('.mi'));
 const btnCanvases = items.map(el => el.querySelector('canvas'));
-// Каждая кнопка "дышит" со своим сдвигом по времени
 const tOff        = items.map(() => Math.random() * 80);
 
 function renderBtn(canvas, t) {
   let i = 0;
   for (let y = 0; y < BH; y++) {
-    // vy: от -1 (верх) до +1 (низ)
     const vy = (y / (BH - 1)) * 2 - 1;
-    // Вертикальный градиент: слегка ярче в центре
     const vf = 0.76 + 0.24 * (1 - Math.abs(vy));
 
     for (let x = 0; x < BW; x++) {
       const nx = x * 0.12, ny = y * 0.12;
 
-      // Замедленный FBM — вдвое медленнее оригинала
       let n  = fbm(nx +        t * .08,  ny +        t * .03);
           n  = n * .65 + fbm(nx * 1.5 + t * .13 + 9,
                              ny * 1.5 - t * .04 + 5) * .35;
 
-      // Пространственное затухание
       n *= hEdge[x] * vf;
 
-      // Более тёмная палитра: почти чёрный → тёмно-кровавый
       nPx[i++] = (13 + n *  66) | 0; // R
       nPx[i++] = (     n *   8) | 0; // G
       nPx[i++] = (     n *   5) | 0; // B
@@ -295,10 +247,8 @@ function renderBtn(canvas, t) {
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(offC, 0, 0, w, h);
 
-  // ── Красные границы сверху и снизу — нечёткие слева и справа ──
-  const pulse = 0.80 + Math.sin(t * 0.062) * 0.20; // медленная пульсация ~7 сек
+  const pulse = 0.80 + Math.sin(t * 0.062) * 0.20;
 
-  // Горизонтальный градиент: тают к левому и правому краю
   const bGrad = ctx.createLinearGradient(0, 0, w, 0);
   bGrad.addColorStop(0,    'rgba(140,4,2,0)');
   bGrad.addColorStop(0.06, `rgba(205,10,3,${0.84 * pulse})`);
@@ -328,9 +278,6 @@ function renderBtn(canvas, t) {
   */
 }
 
-/* ═══════════════════════════════════════════════════════
-   НАВИГАЦИЯ ПО МЕНЮ
-   ═══════════════════════════════════════════════════════ */
 let sel = 0;
 
 function selectItem(i) {
@@ -341,31 +288,24 @@ function selectItem(i) {
 
 selectItem(0);
 
-// Мышь
 items.forEach((el, i) => {
   el.addEventListener('mouseenter', () => selectItem(i));
 });
 
-// Клавиатура
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown') { e.preventDefault(); selectItem(sel + 1); }
   if (e.key === 'ArrowUp')   { e.preventDefault(); selectItem(sel - 1); }
 });
 
-/* ═══════════════════════════════════════════════════════
-   ГЛАВНЫЙ ЦИКЛ
-   ═══════════════════════════════════════════════════════ */
 let animT = 0;
 
 function loop() {
   renderGrain();
-  // Рендерим blood-текстуру только для активной кнопки
   renderBtn(btnCanvases[sel], animT + tOff[sel]);
   animT += 0.20;
   requestAnimationFrame(loop);
 }
 
-// Инициализируем размеры canvas после отрисовки и загрузки шрифтов
 function init() {
   btnCanvases.forEach(c => {
     c.width  = c.parentElement.offsetWidth  || 375;
