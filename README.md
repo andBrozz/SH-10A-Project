@@ -1,5 +1,5 @@
 # SH-10A-Project
 
 Team:
-andbrozz
+andbrozz, 
 Arina Daniielian(Enneru)
