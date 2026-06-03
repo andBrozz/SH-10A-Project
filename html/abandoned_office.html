@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abandoned Office</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:#020100;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.scene{
+  position:relative;
+  width:min(900px,100vmin);
+  height:min(900px,100vmin);
+  background:#0c0804;
+  overflow:hidden;
+  box-shadow:0 0 120px rgba(0,0,0,1);
+}
+
+/* ══════════════════════════════════════
+   WALL
+══════════════════════════════════════ */
+.wall{
+  position:absolute;inset:0;z-index:1;
+  background:
+    radial-gradient(ellipse 58% 68% at 32% 44%, #221608 0%, #160f05 42%, #0c0803 100%);
+}
+/* cracked plaster texture */
+.wall::before{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(92deg,transparent 34%,rgba(0,0,0,.05) 34.3%,transparent 34.6%),
+    linear-gradient(185deg,transparent 55%,rgba(0,0,0,.04) 55.4%,transparent 55.8%),
+    linear-gradient(87deg,transparent 62%,rgba(0,0,0,.03) 62.3%,transparent 62.7%),
+    linear-gradient(178deg,transparent 28%,rgba(0,0,0,.04) 28.4%,transparent 28.8%),
+    linear-gradient(96deg,transparent 78%,rgba(0,0,0,.04) 78.4%,transparent 78.8%);
+}
+.wall::after{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 65% 30%, rgba(0,0,0,.2) 0%, transparent 30%),
+    radial-gradient(circle at 80% 75%, rgba(0,0,0,.25) 0%, transparent 25%);
+}
+
+/* ══════════════════════════════════════
+   WINDOW AMBIENT GLOW
+══════════════════════════════════════ */
+.win-glow{
+  position:absolute;left:-10%;top:-8%;
+  width:82%;height:108%;z-index:2;pointer-events:none;
+  background:
+    radial-gradient(ellipse 42% 58% at 40% 50%,
+      rgba(252,192,42,.32) 0%,
+      rgba(224,142,22,.16) 35%,
+      rgba(172,88,10,.07) 60%,
+      transparent 78%
+    );
+}
+
+/* ══════════════════════════════════════
+   LIGHT RAYS
+══════════════════════════════════════ */
+.rays{
+  position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;
+}
+.ray{
+  position:absolute;top:0;height:100%;
+  background:linear-gradient(180deg,transparent 0%,rgba(255,195,68,.055) 45%,transparent 100%);
+  transform-origin:30% 38%;
+  filter:blur(4px);
+}
+
+/* ══════════════════════════════════════
+   WINDOW ASSEMBLY
+══════════════════════════════════════ */
+.win{
+  position:absolute;
+  left:11%;top:1.5%;
+  width:33%;height:80%;
+  z-index:10;
+}
+
+.win-light{
+  position:absolute;inset:11px;
+  background:radial-gradient(ellipse at 50% 65%,
+    #ffe884 0%,#f5c030 22%,#e8a020 52%,#d08015 78%,#b86010 100%
+  );
+  overflow:hidden;
+}
+
+/* Light shimmer animation */
+.win-light::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 45% 60%,rgba(255,255,220,.15) 0%,transparent 60%);
+  animation:shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer{
+  0%,100%{opacity:1}
+  50%{opacity:.7}
+}
+
+.win-frame{
+  position:absolute;inset:0;
+  border:11px solid #2c1c0a;
+  box-shadow:
+    inset 0 0 0 2px #190e06,
+    6px 0 22px rgba(0,0,0,.75),
+    -3px 0 12px rgba(0,0,0,.5);
+  z-index:12;pointer-events:none;
+}
+/* Inner frame bevel */
+.win-frame::before{
+  content:'';position:absolute;inset:0;
+  border:3px solid rgba(255,255,255,.04);
+}
+
+/* Pane cross dividers */
+.win-cross{
+  position:absolute;inset:0;z-index:14;pointer-events:none;
+}
+.win-cross::before{
+  content:'';position:absolute;
+  left:calc(50% - 3px);top:11px;bottom:11px;width:6px;
+  background:#2c1c0a;
+  box-shadow:0 0 3px rgba(0,0,0,.6);
+}
+.win-cross::after{
+  content:'';position:absolute;
+  top:calc(44% - 3px);left:11px;right:11px;height:6px;
+  background:#2c1c0a;
+  box-shadow:0 0 3px rgba(0,0,0,.6);
+}
+
+/* Glass grime */
+.win-grime{
+  position:absolute;inset:0;z-index:13;pointer-events:none;
+  background:
+    radial-gradient(circle at 22% 28%,rgba(110,68,8,.4) 0%,transparent 28%),
+    radial-gradient(circle at 76% 18%,rgba(85,52,4,.28) 0%,transparent 22%),
+    radial-gradient(circle at 12% 80%,rgba(95,58,5,.3) 0%,transparent 24%),
+    radial-gradient(circle at 68% 72%,rgba(72,46,3,.22) 0%,transparent 20%),
+    radial-gradient(circle at 50% 45%,rgba(60,38,2,.12) 0%,transparent 35%);
+}
+
+/* ══════════════════════════════════════
+   BLINDS
+══════════════════════════════════════ */
+.blinds{
+  position:absolute;inset:11px;
+  height:calc(36%);
+  overflow:hidden;z-index:15;pointer-events:none;
+}
+.slat{
+  position:absolute;
+  height:9px;
+  background:linear-gradient(180deg,#604228 0%,#3e2814 55%,#2a1a08 100%);
+  box-shadow:0 2px 3px rgba(0,0,0,.65),0 -1px 0 rgba(255,175,50,.08);
+}
+
+/* ══════════════════════════════════════
+   PLANTS (placed inside win-light)
+══════════════════════════════════════ */
+.plants{
+  position:absolute;bottom:0;left:0;right:0;
+  height:57%;z-index:16;pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   WINDOWSILL
+══════════════════════════════════════ */
+.sill{
+  position:absolute;
+  bottom:-10px;left:-18px;right:-18px;height:20px;
+  background:linear-gradient(180deg,#5e3a20,#3c2512);
+  border-top:2px solid #7e5232;
+  box-shadow:0 5px 15px rgba(0,0,0,.72),0 -2px 8px rgba(245,180,42,.14);
+  z-index:18;
+}
+
+/* ══════════════════════════════════════
+   FLOOR
+══════════════════════════════════════ */
+.floor{
+  position:absolute;bottom:0;left:0;right:0;height:9%;z-index:5;
+  background:linear-gradient(180deg,#160d04 0%,#0c0702 100%);
+  box-shadow:inset 0 6px 22px rgba(0,0,0,.85);
+}
+
+/* floor window light patch */
+.floor-light{
+  position:absolute;
+  left:8%;bottom:0;
+  width:40%;height:100%;
+  background:radial-gradient(ellipse at 30% 0%,
+    rgba(220,155,30,.12) 0%,transparent 70%
+  );
+  pointer-events:none;
+  z-index:6;
+}
+
+/* ══════════════════════════════════════
+   BULLETIN BOARD
+══════════════════════════════════════ */
+.board{
+  position:absolute;
+  right:1%;top:26%;
+  width:44%;height:46%;z-index:8;
+}
+.board-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(148deg,#9a7218 0%,#7a5a12 35%,#6a4e0f 65%,#8a6515 100%);
+  border:9px solid #2c1e0a;
+  box-shadow:
+    inset 0 0 24px rgba(0,0,0,.55),
+    0 6px 28px rgba(0,0,0,.72),
+    -6px 0 16px rgba(0,0,0,.55);
+  overflow:hidden;
+}
+.board-bg::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(45deg,transparent,transparent 13px,rgba(0,0,0,.038) 14px),
+    radial-gradient(circle at 20% 16%,rgba(255,255,255,.058) 0%,transparent 32%),
+    radial-gradient(circle at 75% 80%,rgba(0,0,0,.12) 0%,transparent 30%);
+}
+/* board shadow on wall below it */
+.board::after{
+  content:'';position:absolute;
+  bottom:-15px;left:5%;right:5%;height:15px;
+  background:rgba(0,0,0,.35);
+  filter:blur(8px);
+}
+
+/* ══════════════════════════════════════
+   DESK
+══════════════════════════════════════ */
+.desk{
+  position:absolute;
+  right:0;bottom:9%;
+  width:58%;height:38%;z-index:22;
+}
+.desk-ledge{
+  position:absolute;top:0;left:0;right:0;height:18px;
+  background:linear-gradient(180deg,#7c5232,#5c3a20);
+  border-top:2px solid #9e6a42;
+  box-shadow:0 4px 16px rgba(0,0,0,.62);
+}
+.desk-top{
+  position:absolute;top:18px;left:0;right:0;height:72px;
+  background:linear-gradient(180deg,#4e3016 0%,#3e2612 70%,#341e0c 100%);
+  box-shadow:inset 0 -10px 30px rgba(0,0,0,.42);
+  overflow:hidden;
+}
+.desk-top::before{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,rgba(248,175,48,.1) 0%,transparent 40%),
+    repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,0,0,.03) 61px);
+}
+/* wood grain lines */
+.desk-top::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,transparent 30%,rgba(0,0,0,.06) 31%,transparent 32%),
+    linear-gradient(180deg,transparent 55%,rgba(0,0,0,.05) 56%,transparent 57%),
+    linear-gradient(180deg,transparent 78%,rgba(0,0,0,.06) 79%,transparent 80%);
+}
+.desk-front{
+  position:absolute;top:90px;left:0;right:0;bottom:0;
+  background:linear-gradient(180deg,#2e1c0a 0%,#1e1005 100%);
+  border-top:1px solid #4c3016;
+}
+/* desk leg detail */
+.desk-front::before{
+  content:'';position:absolute;
+  left:10%;top:0;width:6px;bottom:0;
+  background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(0,0,0,.1));
+}
+.desk-front::after{
+  content:'';position:absolute;
+  right:12%;top:0;width:6px;bottom:0;
+  background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(0,0,0,.1));
+}
+
+/* ══════════════════════════════════════
+   VIGNETTE + PARTICLES
+══════════════════════════════════════ */
+.vignette{
+  position:absolute;inset:0;z-index:46;pointer-events:none;
+  background:radial-gradient(ellipse at 38% 50%,transparent 28%,rgba(0,0,0,.7) 100%);
+}
+#particles{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  z-index:47;pointer-events:none;
+}
+#typewriter-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:210;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(4px);
+}
+#typewriter-modal.open{
+  display:flex;
+}
+#typewriter-modal .modal-panel{
+  position:relative;
+  width:min(860px,92vw);
+  max-height:min(78vh,700px);
+  background:linear-gradient(145deg,#131313,#252525);
+  border:3px solid #5b1818;
+  border-radius:20px;
+  box-shadow:0 0 80px rgba(0,0,0,.95);
+  padding:22px;
+  overflow:hidden;
+}
+#typewriter-modal #modal-close{
+  position:absolute;
+  top:18px;
+  right:18px;
+  width:56px;
+  height:56px;
+  background:#4d0202;
+  border:3px solid #7d0202;
+  border-radius:16px;
+  color:#f6b6b6;
+  font-size:30px;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform .17s ease, background .17s ease;
+  z-index:2;
+}
+#typewriter-modal #modal-close:hover{
+  transform:scale(1.06);
+  background:#7b0505;
+}
+#typewriter-modal #modal-paper{
+  position:relative;
+  height:210px;
+  background:#f7f1e9;
+  border:3px solid #aa8d53;
+  border-radius:20px;
+  padding:20px;
+  font-family:monospace;
+  font-size:15px;
+  color:#2a2a2a;
+  line-height:1.6;
+  overflow:auto;
+  box-shadow:inset 0 10px 30px rgba(0,0,0,.12);
+}
+#typewriter-modal #modal-paper #paper-text{
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+#typewriter-modal #modal-keyboard{
+  margin-top:18px;
+  background:#181818;
+  border:2px solid #333;
+  border-radius:18px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+#typewriter-modal button.key-btn{
+  min-width:48px;
+  min-height:46px;
+  background:#252525;
+  border:2px solid #3d3d3d;
+  color:#d4b765;
+  font-family:monospace;
+  font-size:14px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:transform .14s ease, background .14s ease;
+}
+#typewriter-modal button.key-btn:hover{
+  background:#313131;
+  transform:translateY(-1px);
+}
+#typewriter-modal button.special-key{
+  min-width:90px;
+  background:#2e2e2e;
+  border-color:#4a4a4a;
+}
+#typewriter-modal #inventory-box{
+  position:absolute;
+  bottom:20px;
+  right:20px;
+  width:190px;
+  min-height:96px;
+  background:rgba(16,6,6,.96);
+  border:2px solid #7c1515;
+  border-radius:20px;
+  padding:16px;
+  color:#e3c77b;
+  font-family:monospace;
+  box-shadow:0 0 28px rgba(120,10,10,.32);
+}
+#typewriter-modal #inventory-box .inv-title{
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#ffd87f;
+}
+#typewriter:hover {
+  transform:scale(1.02);
+  filter:drop-shadow(0 0 20px rgba(151, 18, 8, 0.75)) drop-shadow(0 0 28px rgba(255,100,48,.45));
+}
+#typewriter {
+  transition:transform .2s ease, filter .2s ease;
+  cursor:pointer;
+}
+.page-nav{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:62px;
+  height:124px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(16,8,6,.62);
+  border:1px solid rgba(255,80,80,.24);
+  border-radius:28px;
+  color:#ffc2c2;
+  text-decoration:none;
+  font-family:system-ui, sans-serif;
+  font-size:.76rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-align:center;
+  backdrop-filter:blur(8px);
+  z-index:220;
+  transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.page-nav:hover{
+  transform:translateY(-50%) scale(1.04);
+  box-shadow:0 0 30px rgba(255,80,80,.28);
+  border-color:rgba(255,120,120,.5);
+}
+.page-nav-left{left:18px;}
+.page-nav-right{right:18px;}
+.page-nav-icon{font-size:1.5rem;line-height:1;}
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+  <!-- WALL -->
+  <div class="wall"></div>
+
+  <!-- WINDOW AMBIENT GLOW -->
+  <div class="win-glow"></div>
+
+  <!-- FLOOR LIGHT PATCH -->
+  <div class="floor-light"></div>
+
+  <!-- LIGHT RAYS -->
+  <div class="rays" id="rays">
+    <div class="ray" style="left:16%;width:44px;transform:rotate(9deg)"></div>
+    <div class="ray" style="left:23%;width:22px;transform:rotate(13deg);opacity:.65"></div>
+    <div class="ray" style="left:12%;width:56px;transform:rotate(6deg);opacity:.5"></div>
+    <div class="ray" style="left:28%;width:24px;transform:rotate(17deg);opacity:.42"></div>
+    <div class="ray" style="left:19%;width:14px;transform:rotate(10.5deg);opacity:.38"></div>
+  </div>
+
+  <!-- ══ WINDOW ══ -->
+  <div class="win">
+
+    <!-- Warm backlight -->
+    <div class="win-light">
+
+      <!-- PLANTS SVG -->
+      <div class="plants">
+        <svg width="100%" height="100%" viewBox="0 0 280 370"
+             xmlns="http://www.w3.org/2000/svg"
+             preserveAspectRatio="xMidYMax meet">
+
+          <!-- STEMS / VINES -->
+          <path d="M108 370 C103 305 80 258 94 192 C100 164 114 150 124 161"
+                stroke="#182a0d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <path d="M152 370 C146 298 163 250 145 190 C138 164 130 150 134 138"
+                stroke="#142208" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M65 370 C60 318 38 285 54 245 C64 220 80 215 90 230"
+                stroke="#1c2e12" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M198 370 C193 322 208 285 190 235"
+                stroke="#162008" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <path d="M234 370 C230 335 245 308 225 278"
+                stroke="#142008" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <path d="M30 370 C26 340 14 318 25 295 C32 280 46 278 52 292"
+                stroke="#1a2c0e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+          <!-- LARGE LEAVES -->
+          <!-- Leaf 1 – left reach -->
+          <path d="M94 192 C50 174 20 146 38 112 C52 86 78 84 94 103
+                   C105 118 102 150 94 192"
+                fill="#182808" opacity=".96"/>
+          <!-- Leaf 2 – right reach from main stem -->
+          <path d="M124 161 C168 134 196 144 184 175
+                   C175 198 152 200 124 161"
+                fill="#1d3010" opacity=".92"/>
+          <!-- Leaf 3 – upward from second stem -->
+          <path d="M134 138 C108 100 112 68 140 62
+                   C162 58 175 78 160 106 C150 124 134 138 134 138"
+                fill="#162208" opacity=".94"/>
+          <!-- Leaf 4 – left medium -->
+          <path d="M90 230 C46 206 16 220 18 252
+                   C22 278 56 288 90 230"
+                fill="#1a2a0c" opacity=".9"/>
+          <!-- Leaf 5 – far left -->
+          <path d="M54 245 C28 274 4 280 0 258
+                   C-4 234 14 218 54 245"
+                fill="#142008" opacity=".88"/>
+          <!-- Leaf 6 – right from stem 4 -->
+          <path d="M190 235 C228 208 254 218 248 250
+                   C240 272 215 274 190 235"
+                fill="#1c2e0f" opacity=".87"/>
+          <!-- Leaf 7 – mid branch from stem 2 -->
+          <path d="M145 190 C182 173 208 183 200 208
+                   C192 228 168 230 145 190"
+                fill="#182808" opacity=".9"/>
+          <!-- Leaf 8 – low left -->
+          <path d="M69 305 C44 288 34 299 40 315
+                   C46 330 63 328 69 305"
+                fill="#1a2a10" opacity=".87"/>
+          <!-- Leaf 9 – low right -->
+          <path d="M166 312 C188 298 200 311 196 328
+                   C190 342 170 340 166 312"
+                fill="#162208" opacity=".84"/>
+          <!-- Leaf 10 – stem 5 branch -->
+          <path d="M225 278 C252 260 268 270 262 294
+                   C256 314 232 316 225 278"
+                fill="#1a2810" opacity=".85"/>
+          <!-- Leaf 11 – bottom spread left -->
+          <path d="M108 370 C68 342 28 332 22 357
+                   C16 378 50 390 108 370"
+                fill="#0f1c06" opacity=".92"/>
+          <!-- Leaf 12 – bottom spread right -->
+          <path d="M152 370 C185 348 215 344 220 368
+                   C224 386 190 395 152 370"
+                fill="#121e08" opacity=".9"/>
+          <!-- Leaf 13 – lower stem 6 -->
+          <path d="M52 292 C28 305 14 320 20 335
+                   C26 348 48 342 52 292"
+                fill="#1c2e0e" opacity=".82"/>
+
+          <!-- SEMI-TRANSLUCENT BACKLIT LEAVES -->
+          <path d="M112 136 C87 110 91 78 114 72
+                   C133 68 146 87 130 114 C122 130 112 136 112 136"
+                fill="#2a4818" opacity=".62"/>
+          <path d="M170 150 C196 126 218 133 212 160
+                   C206 182 182 184 170 150"
+                fill="#243d14" opacity=".56"/>
+          <path d="M76 250 C50 265 36 280 44 294
+                   C52 306 74 298 76 250"
+                fill="#1e3010" opacity=".68"/>
+          <path d="M200 255 C224 240 238 250 232 268
+                   C226 284 204 284 200 255"
+                fill="#1c2e0e" opacity=".55"/>
+
+          <!-- WINDOWSILL DEBRIS / PAPERS -->
+          <rect x="10"  y="345" width="52" height="22" rx="1.5"
+                fill="#c8bc98" opacity=".68"
+                transform="rotate(-7 36 356)"/>
+          <rect x="188" y="350" width="60" height="17" rx="1.5"
+                fill="#b8aa88" opacity=".58"
+                transform="rotate(5 218 358)"/>
+          <rect x="98"  y="354" width="34" height="11" rx="1"
+                fill="#c0b490" opacity=".52"
+                transform="rotate(-3 115 359)"/>
+          <!-- Pebble/debris -->
+          <ellipse cx="75" cy="363" rx="5" ry="3.5" fill="#5a4020" opacity=".6"/>
+          <ellipse cx="155" cy="360" rx="4" ry="3" fill="#4a3218" opacity=".55"/>
+        </svg>
+      </div>
+
+      <!-- Glass grime -->
+      <div class="win-grime"></div>
+    </div>
+
+    <!-- Window pane cross -->
+    <div class="win-cross"></div>
+
+    <!-- Window frame -->
+    <div class="win-frame"></div>
+
+    <!-- BLINDS (generated by JS) -->
+    <div class="blinds" id="blinds"></div>
+
+    <!-- Windowsill -->
+    <div class="sill"></div>
+  </div>
+
+  <!-- FLOOR -->
+  <div class="floor"></div>
+
+  <!-- ══ BULLETIN BOARD ══ -->
+  <div class="board">
+    <div class="board-bg" id="board"></div>
+  </div>
+
+  <!-- ══ DESK ══ -->
+  <div class="desk">
+    <div class="desk-ledge"></div>
+    <div class="desk-top" id="desk-top"></div>
+    <div class="desk-front">
+      <!-- Drawer 1 -->
+      <div style="position:absolute;left:18%;top:12%;width:26%;height:26%;
+                  background:linear-gradient(180deg,#261808,#1c1004);
+                  border-top:1px solid #3e2a12;border-bottom:1px solid #160e04;
+                  display:flex;align-items:center;justify-content:center;">
+        <div style="width:36%;height:5px;background:#3a2810;border-radius:2px;
+                    box-shadow:0 1px 4px rgba(0,0,0,.6)"></div>
+      </div>
+      <!-- Drawer 2 -->
+      <div style="position:absolute;left:18%;top:42%;width:26%;height:26%;
+                  background:linear-gradient(180deg,#221604,#181002);
+                  border-top:1px solid #3e2a12;border-bottom:1px solid #120c04;
+                  display:flex;align-items:center;justify-content:center;">
+        <div style="width:36%;height:5px;background:#38280e;border-radius:2px;
+                    box-shadow:0 1px 4px rgba(0,0,0,.6)"></div>
+      </div>
+    </div>
+
+    <!-- ══ TYPEWRITER SVG ══ -->
+    <svg id="typewriter"
+         style="position:absolute;right:20%;bottom:72%;width:35%;z-index:26;"
+         viewBox="0 0 248 186" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- TYPEWRITER SHADOW -->
+     
+    <!-- ── BASE PLATFORM ── -->
+    <rect x="3"  y="130" width="242" height="44" rx="5" fill="#2c3832"/>
+    <rect x="0"  y="138" width="248" height="6"  rx="2" fill="#232e2a"/>
+    <rect x="2"  y="164" width="244" height="8"  rx="3" fill="#1e2820"/>
+    <!-- Base rim highlight -->
+    <rect x="4"  y="130" width="240" height="4"  rx="2" fill="#38443e"/>
+    <!-- Rubber feet -->
+    <rect x="12"  y="166" width="22" height="7" rx="2.5" fill="#141410"/>
+    <rect x="214" y="166" width="22" height="7" rx="2.5" fill="#141410"/>
+
+    <!-- ── KEY AREA BODY ── -->
+    <rect x="12" y="86" width="224" height="52" rx="6" fill="#2a3230"/>
+    <!-- Front bevel -->
+    <rect x="12" y="128" width="224" height="10" rx="3" fill="#222a28"/>
+    <!-- Key area top accent strip -->
+    <rect x="12" y="86" width="224" height="5"  rx="3" fill="#363e3c"/>
+
+    <!-- ── SHIFT / RETURN LEVERS ── -->
+    <rect x="16" y="118" width="34" height="7" rx="3.5" fill="#3e3e3e"/>
+    <rect x="16" y="119" width="34" height="3"  rx="2"   fill="#4a4a4a"/>
+    <rect x="198" y="115" width="36" height="7" rx="3.5" fill="#3e3e3e"/>
+    <rect x="198" y="116" width="36" height="3"  rx="2"   fill="#4a4a4a"/>
+
+    <!-- ── KEYS ROW 1 (bottom, y=116) ── -->
+    <g id="kr1">
+      <circle cx="32"  cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="32"  cy="116" r="4.8" fill="#242424"/>
+      <circle cx="51"  cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="51"  cy="116" r="4.8" fill="#242424"/>
+      <circle cx="70"  cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="70"  cy="116" r="4.8" fill="#242424"/>
+      <circle cx="89"  cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="89"  cy="116" r="4.8" fill="#242424"/>
+      <circle cx="108" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="108" cy="116" r="4.8" fill="#242424"/>
+      <circle cx="127" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="127" cy="116" r="4.8" fill="#242424"/>
+      <circle cx="146" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="146" cy="116" r="4.8" fill="#242424"/>
+      <circle cx="165" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="165" cy="116" r="4.8" fill="#242424"/>
+      <circle cx="184" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="184" cy="116" r="4.8" fill="#242424"/>
+      <circle cx="203" cy="116" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/>
+      <circle cx="203" cy="116" r="4.8" fill="#242424"/>
+    </g>
+
+    <!-- ── KEYS ROW 2 (y=99) ── -->
+    <g id="kr2">
+      <circle cx="38"  cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="38"  cy="99" r="4.8" fill="#242424"/>
+      <circle cx="57"  cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="57"  cy="99" r="4.8" fill="#242424"/>
+      <circle cx="76"  cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="76"  cy="99" r="4.8" fill="#242424"/>
+      <circle cx="95"  cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="95"  cy="99" r="4.8" fill="#242424"/>
+      <circle cx="114" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="114" cy="99" r="4.8" fill="#242424"/>
+      <circle cx="133" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="133" cy="99" r="4.8" fill="#242424"/>
+      <circle cx="152" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="152" cy="99" r="4.8" fill="#242424"/>
+      <circle cx="171" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="171" cy="99" r="4.8" fill="#242424"/>
+      <circle cx="190" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="190" cy="99" r="4.8" fill="#242424"/>
+      <circle cx="209" cy="99" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="209" cy="99" r="4.8" fill="#242424"/>
+    </g>
+
+    <!-- ── KEYS ROW 3 (top, y=83) ── -->
+    <g id="kr3">
+      <circle cx="44"  cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="44"  cy="83" r="4.8" fill="#242424"/>
+      <circle cx="63"  cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="63"  cy="83" r="4.8" fill="#242424"/>
+      <circle cx="82"  cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="82"  cy="83" r="4.8" fill="#242424"/>
+      <circle cx="101" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="101" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="120" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="120" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="139" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="139" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="158" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="158" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="177" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="177" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="196" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="196" cy="83" r="4.8" fill="#242424"/>
+      <circle cx="215" cy="83" r="6.8" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1.2"/><circle cx="215" cy="83" r="4.8" fill="#242424"/>
+    </g>
+
+    <!-- SPACE BAR -->
+    <rect x="68" y="128" width="112" height="10" rx="5" fill="#1c1c1c" stroke="#3e3e3e" stroke-width="1"/>
+    <rect x="68" y="128" width="112" height="4"  rx="5" fill="#222"/>
+
+    <!-- ── UPPER CHASSIS ── -->
+    <rect x="16" y="40" width="216" height="50" rx="6" fill="#2e3a34"/>
+    <rect x="16" y="40" width="216" height="6"  rx="3" fill="#3a4640"/>
+    <!-- Side panels -->
+    <rect x="8"  y="44" width="20" height="44" rx="4" fill="#2a3430"/>
+    <rect x="220" y="44" width="20" height="44" rx="4" fill="#2a3430"/>
+
+    <!-- ── TYPE GUIDE BAR ── -->
+    <rect x="26" y="76" width="196" height="4.5" rx="2" fill="#1a1a1a"/>
+    <rect x="26" y="76" width="196" height="2"   rx="2" fill="#262626"/>
+
+    <!-- ── RIBBON SPOOLS ── -->
+    <!-- Left -->
+    <circle cx="36"  cy="60" r="13" fill="#1c1c1c"/>
+    <circle cx="36"  cy="60" r="8"  fill="#282828"/>
+    <circle cx="36"  cy="60" r="4"  fill="#1a1a1a"/>
+    <line x1="28" y1="52" x2="44" y2="68" stroke="#202020" stroke-width="1.5"/>
+    <line x1="44" y1="52" x2="28" y2="68" stroke="#202020" stroke-width="1.5"/>
+    <!-- Right -->
+    <circle cx="212" cy="60" r="13" fill="#1c1c1c"/>
+    <circle cx="212" cy="60" r="8"  fill="#282828"/>
+    <circle cx="212" cy="60" r="4"  fill="#1a1a1a"/>
+    <line x1="204" y1="52" x2="220" y2="68" stroke="#202020" stroke-width="1.5"/>
+    <line x1="220" y1="52" x2="204" y2="68" stroke="#202020" stroke-width="1.5"/>
+    <!-- Ribbon bridge -->
+    <path d="M49 62 Q124 68 199 62" stroke="#1a1a1a" stroke-width="3" fill="none"/>
+
+    <!-- Carriage release detail -->
+    <rect x="18" y="40" width="212" height="5" rx="2" fill="#26302c"/>
+
+    <!-- ── PLATEN / ROLLER ── -->
+    <rect x="14" y="18" width="220" height="28" rx="14" fill="#1c1c1c"/>
+    <rect x="22" y="22" width="204" height="17" rx="8"  fill="#242424"/>
+    <!-- Platen texture lines -->
+    <line x1="22" y1="26" x2="226" y2="26" stroke="#1e1e1e" stroke-width="1"/>
+    <line x1="22" y1="30" x2="226" y2="30" stroke="#1e1e1e" stroke-width="1"/>
+    <line x1="22" y1="34" x2="226" y2="34" stroke="#1e1e1e" stroke-width="1"/>
+    <!-- Platen end knobs -->
+    <circle cx="8"   cy="32" r="11" fill="#202020"/>
+    <circle cx="8"   cy="32" r="7"  fill="#2c2c2c"/>
+    <circle cx="8"   cy="32" r="3"  fill="#1a1a1a"/>
+    <circle cx="240" cy="32" r="11" fill="#202020"/>
+    <circle cx="240" cy="32" r="7"  fill="#2c2c2c"/>
+    <circle cx="240" cy="32" r="3"  fill="#1a1a1a"/>
+
+    <!-- Paper guide bar (thin, above platen) -->
+    <rect x="54" y="8" width="140" height="5" rx="2.5" fill="#2c2c2c"/>
+    <rect x="54" y="8" width="140" height="2"   rx="2.5" fill="#383838"/>
+
+    <!-- ── PAPER ── -->
+    <rect x="70" y="-60" width="108" height="88" rx="1" fill="#ece3cc"/>
+    <!-- paper shadow where it enters platen -->
+    <rect x="70" y="20"  width="108" height="7" fill="rgba(0,0,0,.18)"/>
+    <!-- Paper aged margin lines -->
+    <line x1="84"  y1="-48" x2="166" y2="-48" stroke="#d5ccb2" stroke-width=".9"/>
+    <line x1="84"  y1="-40" x2="166" y2="-40" stroke="#d5ccb2" stroke-width=".9"/>
+    <line x1="84"  y1="-32" x2="166" y2="-32" stroke="#d5ccb2" stroke-width=".9"/>
+    <line x1="84"  y1="-24" x2="166" y2="-24" stroke="#d5ccb2" stroke-width=".9"/>
+    <line x1="84"  y1="-16" x2="166" y2="-16" stroke="#d5ccb2" stroke-width=".9"/>
+    <line x1="84"  y1="-8"  x2="166" y2="-8"  stroke="#d5ccb2" stroke-width=".9"/>
+    <!-- Typed text (monospace dots) -->
+    <text x="86" y="-44" font-size="4.8" fill="#383022"
+          font-family="Courier New,monospace" opacity=".78">....... .... ......</text>
+    <text x="86" y="-36" font-size="4.8" fill="#383022"
+          font-family="Courier New,monospace" opacity=".78">.... ...... .....</text>
+    <text x="86" y="-28" font-size="4.8" fill="#383022"
+          font-family="Courier New,monospace" opacity=".78">......... .... ....</text>
+    <text x="86" y="-20" font-size="4.8" fill="#383022"
+          font-family="Courier New,monospace" opacity=".78">....... .......</text>
+    <!-- Left margin mark -->
+    <line x1="86" y1="-58" x2="86" y2="0" stroke="#e0b090" stroke-width=".8" opacity=".5"/>
+
+    <!-- ── RETURN LEVER ── -->
+    <path d="M228 24 Q240 18 244 28" stroke="#404040" stroke-width="5"
+          fill="none" stroke-linecap="round"/>
+
+    <!-- ── CARRIAGE PAPER BAIL ── -->
+    <rect x="70" y="15" width="108" height="5" rx="2.5" fill="#242424"/>
+    </svg>
+  </div>
+
+  <!-- ══ VIGNETTE ══ -->
+  <div class="vignette"></div>
+
+  <a class="page-nav page-nav-right" href="chained_door.html">
+    <span class="page-nav-icon">→</span>
+  </a>
+
+  <!-- ══ PARTICLES ══ -->
+  <canvas id="particles"></canvas>
+
+  <!-- TYPEWRITER INTERACTION OVERLAY -->
+  <div id="typewriter-modal">
+    <div class="modal-panel">
+      <div id="modal-close">✕</div>
+      <div id="modal-paper">
+        <div id="paper-text"></div>
+      </div>
+      <div id="modal-keyboard"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────
+//  BLINDS
+// ─────────────────────────────────────
+const blindsEl = document.getElementById('blinds');
+const slats = [
+  {t:0,   r:-2,   w:'107%', l:'-3.5%'},
+  {t:12,  r:1,    w:'102%', l:'-2.5%'},
+  {t:23,  r:-5,   w:'107%', l:'-3.5%', sy:.72},
+  {t:32,  r:3,    w:'63%',  l:'-2%'},
+  {t:42,  r:-8.5, w:'80%',  l:'16%'},
+  {t:51,  r:2.5,  w:'45%',  l:'-2%'},
+  {t:60,  r:-3.5, w:'72%',  l:'-2%'},
+  {t:69,  r:6,    w:'107%', l:'-3.5%', sy:.62},
+  {t:77,  r:-1,   w:'57%',  l:'29%'},
+  {t:86,  r:4.5,  w:'107%', l:'-3.5%'},
+  {t:95,  r:-2,   w:'47%',  l:'-2%'},
+  {t:104, r:1.5,  w:'107%', l:'-3.5%'},
+  {t:113, r:-4,   w:'74%',  l:'-2%'},
+  {t:122, r:2,    w:'107%', l:'-3.5%'},
+];
+slats.forEach(d => {
+  const el = document.createElement('div');
+  el.className = 'slat';
+  el.style.cssText =
+    `top:${d.t}px;left:${d.l};width:${d.w};` +
+    `transform:rotate(${d.r}deg)${d.sy ? ` scaleY(${d.sy})` : ''}`;
+  blindsEl.appendChild(el);
+});
+
+// ─────────────────────────────────────
+//  DESK SURFACE ITEMS
+// ─────────────────────────────────────
+document.getElementById('desk-top').innerHTML = `
+  <!-- Paper stack 1 -->
+  <div style="position:absolute;top:4px;left:3%;width:26%;height:84%;
+              background:linear-gradient(138deg,#ddd2aa,#c8bc90);
+              transform:rotate(-3.5deg);
+              box-shadow:2px 3px 9px rgba(0,0,0,.55);overflow:hidden;">
+    <div style="position:absolute;inset:5px;
+                background:repeating-linear-gradient(transparent,transparent 7px,
+                rgba(0,0,0,.1) 7px,rgba(0,0,0,.1) 8px)"></div>
+    <div style="position:absolute;top:5px;left:5px;right:5px;height:14px;
+                background:rgba(0,0,0,.15)"></div>
+  </div>
+  <!-- Paper 2 behind -->
+  <div style="position:absolute;top:6px;left:5.5%;width:21%;height:75%;
+              background:linear-gradient(138deg,#d2c6a0,#bfb28a);
+              transform:rotate(4.5deg);
+              box-shadow:2px 3px 7px rgba(0,0,0,.44);overflow:hidden;">
+    <div style="position:absolute;inset:4px;
+                background:repeating-linear-gradient(transparent,transparent 7px,
+                rgba(0,0,0,.1) 7px,rgba(0,0,0,.1) 8px)"></div>
+  </div>
+  <!-- Loose paper slipping off edge -->
+  <div style="position:absolute;top:10px;left:0%;width:12%;height:55%;
+              background:#cac09e;
+              transform:rotate(-8deg);
+              box-shadow:1px 2px 6px rgba(0,0,0,.38);"></div>
+  <!-- Pencil -->
+  <div style="position:absolute;bottom:12%;left:24%;width:2.5px;height:52%;
+              background:linear-gradient(180deg,#ccaa22,#8a7218,#f0e0a0,#8a7218);
+              transform:rotate(24deg);z-index:5;border-radius:0 0 1px 1px"></div>
+  <div style="position:absolute;bottom:62%;left:24.4%;width:2px;height:4%;
+              background:#e8c0a0;transform:rotate(24deg);z-index:5"></div>
+  <!-- Pen -->
+  <div style="position:absolute;bottom:8%;left:27%;width:2px;height:50%;
+              background:linear-gradient(180deg,#2a2a2a,#3a3a3a,#1a1a1a);
+              transform:rotate(19deg);z-index:5;border-radius:0 0 1px 1px"></div>
+  <div style="position:absolute;bottom:57%;left:27.4%;width:1.5px;height:3%;
+              background:#c0c0c0;transform:rotate(19deg);z-index:5"></div>
+  <!-- Notebook -->
+  <div style="position:absolute;right:2%;top:5%;width:22%;height:92%;
+              background:linear-gradient(138deg,#1c1612,#100e0a);
+              transform:rotate(2.5deg);
+              box-shadow:3px 4px 12px rgba(0,0,0,.65);z-index:6;">
+    <div style="position:absolute;left:-4px;top:0;bottom:0;width:6px;
+                background:#221a12;box-shadow:1px 0 5px rgba(0,0,0,.45)"></div>
+    <div style="position:absolute;inset:10px;
+                border:1px solid rgba(255,255,255,.05)"></div>
+    <!-- Notebook label -->
+    <div style="position:absolute;top:15%;left:12%;right:12%;height:22%;
+                background:#3a2c18;border:1px solid #4a3820;"></div>
+  </div>
+  <!-- Eraser -->
+  <div style="position:absolute;bottom:18%;left:32%;width:7%;height:10%;
+              background:linear-gradient(135deg,#e8a898,#d09080);
+              transform:rotate(-12deg);border-radius:2px;z-index:5;
+              box-shadow:1px 1px 3px rgba(0,0,0,.4)"></div>
+`;
+
+// ─────────────────────────────────────
+//  BULLETIN BOARD PAPERS
+// ─────────────────────────────────────
+const boardEl = document.getElementById('board');
+const mkPin = (left='50%') =>
+  `<div style="position:absolute;top:-5px;left:${left};
+               transform:translateX(-50%);
+               width:10px;height:10px;border-radius:50%;
+               background:radial-gradient(circle at 32% 30%,#ff7766,#aa1100);
+               box-shadow:0 1px 4px rgba(0,0,0,.65);z-index:10"></div>`;
+
+const boardPapers = [
+  // Large main paper – left-center
+  {
+    style:'left:4%;top:5%;width:38%;height:57%',
+    rot:-2, bg:'#ece0be,#d8cc9a', z:2,
+    pin:'50%',
+    inner:`
+      <div style="position:absolute;inset:6px;
+                  background:repeating-linear-gradient(transparent,transparent 9px,
+                  rgba(0,0,0,.12) 9px,rgba(0,0,0,.12) 10px)"></div>
+      <div style="position:absolute;top:6px;left:6px;right:6px;height:15px;
+                  background:rgba(0,0,0,.18)"></div>
+      <div style="position:absolute;top:25px;left:10px;font-size:5.5px;
+                  font-family:Georgia,serif;color:#2a1808;opacity:.72;line-height:1.8">
+        Contact Information<br>
+        ─────────────────<br>
+        Name: ............<br>
+        Location: ........<br>
+        Status: ..........
+      </div>`
+  },
+  // FERVERBON clipping
+  {
+    style:'left:41%;top:2%;width:30%;height:33%',
+    rot:3.8, bg:'#e0d4b0,#d0c498', z:3,
+    pin:'45%',
+    inner:`
+      <div style="position:absolute;top:9px;left:7px;right:7px;
+                  font-family:Impact,Arial Black,sans-serif;font-size:10px;
+                  color:#2a1808;letter-spacing:2px;font-weight:bold">FERVERBON</div>
+      <div style="position:absolute;top:24px;left:7px;right:7px;font-size:4.5px;
+                  font-family:Georgia,serif;color:#3a2818;opacity:.8;line-height:1.7">
+        Case file reference no. 4471-B<br>
+        Priority classification: HIGH<br>
+        ─────────────────────────────
+      </div>
+      <div style="position:absolute;top:44px;left:7px;right:7px;
+                  background:repeating-linear-gradient(transparent,transparent 6px,
+                  rgba(0,0,0,.1) 6px,rgba(0,0,0,.1) 7px);height:48%"></div>`
+  },
+  // MAP
+  {
+    style:'right:1%;top:4%;width:28%;height:45%',
+    rot:-4.5, bg:'#c8b888,#b8a878', z:2,
+    pin:'50%',
+    inner:`
+      <svg style="position:absolute;inset:0" viewBox="0 0 80 112"
+           xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="112" fill="#c8b888"/>
+        <!-- Grid lines -->
+        <line x1="3"  y1="36" x2="77" y2="36" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <line x1="3"  y1="56" x2="77" y2="56" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <line x1="3"  y1="76" x2="77" y2="76" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <line x1="20" y1="3"  x2="20" y2="109" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <line x1="45" y1="3"  x2="45" y2="109" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <line x1="65" y1="3"  x2="65" y2="109" stroke="#8a7040" stroke-width=".6" stroke-dasharray="3,3" opacity=".7"/>
+        <!-- Region outline -->
+        <path d="M8 24 Q30 16 52 27 Q68 36 64 56 Q58 72 40 75 Q22 78 16 62 Q8 46 8 24"
+              stroke="#8a7040" stroke-width="1.8" fill="rgba(175,135,55,.32)"/>
+        <!-- Sub-region -->
+        <path d="M28 40 Q40 35 50 42 Q55 50 48 58 Q40 64 32 58 Q24 52 28 40"
+              stroke="#7a6035" stroke-width="1.2" fill="rgba(155,120,45,.25)"/>
+        <!-- Roads -->
+        <line x1="8"  y1="62" x2="72" y2="62" stroke="#9a8050" stroke-width="1" opacity=".6"/>
+        <line x1="40" y1="8"  x2="40" y2="104" stroke="#9a8050" stroke-width="1" opacity=".6"/>
+        <!-- Location marker -->
+        <circle cx="43" cy="51" r="5" fill="#c83020" opacity=".88"/>
+        <circle cx="43" cy="51" r="2" fill="#ff5540" opacity=".95"/>
+        <path d="M43 46 V 38" stroke="#c83020" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Compass rose -->
+        <text x="62" y="108" font-size="7" fill="#7a6035" font-family="serif" opacity=".8">N↑</text>
+        <!-- Map label -->
+        <text x="4" y="10" font-size="5" fill="#5a4025" font-family="serif" opacity=".9">SECTOR MAP</text>
+      </svg>`
+  },
+  // Small article bottom-left
+  {
+    style:'left:6%;bottom:5%;width:32%;height:28%',
+    rot:5.2, bg:'#daccaa,#cabb98', z:2,
+    pin:'40%',
+    inner:`
+      <div style="position:absolute;inset:5px;
+                  background:repeating-linear-gradient(transparent,transparent 7px,
+                  rgba(0,0,0,.1) 7px,rgba(0,0,0,.1) 8px)"></div>
+      <div style="position:absolute;top:5px;left:5px;right:5px;height:12px;
+                  background:rgba(0,0,0,.14)"></div>`
+  },
+  // Dark photo/document center-bottom
+  {
+    style:'left:41%;bottom:2%;width:30%;height:36%',
+    rot:-3.2, bg:'#2c2018,#201808', z:3,
+    pin:'55%',
+    inner:`
+      <div style="position:absolute;inset:6px;
+                  background:linear-gradient(138deg,#3c2e1c,#281e10,#181008);"></div>
+      <div style="position:absolute;bottom:8px;left:8px;right:8px;height:12px;
+                  background:rgba(255,255,255,.04)"></div>`
+  },
+  // Right-edge mini note
+  {
+    style:'right:3%;bottom:8%;width:24%;height:24%',
+    rot:7, bg:'#e0d2a8,#d0c298', z:2,
+    pin:'48%',
+    inner:`
+      <div style="position:absolute;inset:4px;
+                  background:repeating-linear-gradient(transparent,transparent 6px,
+                  rgba(0,0,0,.1) 6px,rgba(0,0,0,.1) 7px)"></div>`
+  },
+];
+
+boardPapers.forEach(p => {
+  const d = document.createElement('div');
+  d.style.cssText =
+    `position:absolute;${p.style};` +
+    `background:linear-gradient(138deg,${p.bg});` +
+    `transform:rotate(${p.rot}deg);` +
+    `box-shadow:2px 3px 11px rgba(0,0,0,.58);` +
+    `overflow:visible;z-index:${p.z}`;
+  d.innerHTML = p.inner + mkPin(p.pin);
+  boardEl.appendChild(d);
+});
+
+// ─────────────────────────────────────
+//  DUST PARTICLE SYSTEM
+// ─────────────────────────────────────
+const canvas = document.getElementById('particles');
+const ctx    = canvas.getContext('2d');
+const scene  = document.getElementById('scene');
+
+let W, H;
+function resize(){
+  W = canvas.width  = scene.offsetWidth;
+  H = canvas.height = scene.offsetHeight;
+}
+resize();
+new ResizeObserver(resize).observe(scene);
+
+// spawn more particles near window, fewer elsewhere
+const pts = Array.from({length:110}, (_, i) => {
+  const nearWindow = i < 80;
+  return {
+    x:  nearWindow
+          ? Math.random() * W * 0.52 + W * 0.07
+          : Math.random() * W * 0.75,
+    y:  Math.random() * H,
+    vx: (Math.random() - .46) * .2,
+    vy: -(Math.random() * .32 + .04),
+    r:  Math.random() * 1.5 + .28,
+    a:  Math.random() * (nearWindow ? .52 : .25) + .08,
+    ph: Math.random() * Math.PI * 2,
+    sp: Math.random() * .0045 + .0018,
+    warm: nearWindow,
+  };
+});
+
+function tick(){
+  ctx.clearRect(0, 0, W, H);
+  pts.forEach(p => {
+    p.x  += p.vx + Math.sin(p.ph) * .11;
+    p.y  += p.vy;
+    p.ph += p.sp;
+
+    if(p.y < -4){
+      p.y = H * .92;
+      p.x = p.warm
+        ? Math.random() * W * .5 + W * .07
+        : Math.random() * W * .75;
+      p.a = Math.random() * (p.warm ? .52 : .22) + .08;
+    }
+    if(p.x < 0 || p.x > W * .65) p.vx *= -1;
+
+    // intensity falls off moving away from window
+    const wFade = p.warm
+      ? Math.max(0, 1 - Math.max(0, p.x - W*.55) / (W*.12))
+      : 1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.warm
+      ? `rgba(255,205,88,${p.a * wFade * .82})`
+      : `rgba(220,185,120,${p.a * .4})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(tick);
+}
+tick();
+
+// ─────────────────────────────────────
+//  TYPEWRITER INTERACTIVE PANEL
+// ─────────────────────────────────────
+class Inventory {
+  constructor() {
+    this.maxKeys = 1;
+    this.load();
+  }
+
+  load() {
+    const data = localStorage.getItem('typewriter-inventory');
+    this.keys = data ? parseInt(data, 10) : 0;
+  }
+
+  save() {
+    localStorage.setItem('typewriter-inventory', this.keys.toString());
+  }
+
+  addKey() {
+    if (this.keys < this.maxKeys) {
+      this.keys += 1;
+      this.save();
+      this.updateUI();
+      return true;
+    }
+    return false;
+  }
+
+  updateUI() {
+    const count = document.getElementById('inv-keys');
+    if (count) {
+      count.textContent = `Ключ: ${this.keys} / ${this.maxKeys}`;
+    }
+  }
+}
+
+const inventory = new Inventory();
+inventory.updateUI();
+
+const typewriterEl = document.getElementById('typewriter');
+const modal = document.getElementById('typewriter-modal');
+const closeBtn = document.getElementById('modal-close');
+const paperText = document.getElementById('paper-text');
+const keyboard = document.getElementById('modal-keyboard');
+
+let currentText = '';
+let modalOpen = false;
+let closeTimer = null;
+
+const keyRows = [
+  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+  ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
+];
+
+function createKeyboardUI() {
+  keyboard.innerHTML = '';
+
+  keyRows.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap';
+
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'key-btn';
+      btn.textContent = key;
+      btn.onclick = () => typeKey(key);
+      btn.onmousedown = () => btn.style.transform = 'scale(0.96)';
+      btn.onmouseup = () => btn.style.transform = 'scale(1)';
+      btn.onmouseleave = () => btn.style.transform = 'scale(1)';
+      rowDiv.appendChild(btn);
+    });
+
+    keyboard.appendChild(rowDiv);
+  });
+
+  const specialRow = document.createElement('div');
+  specialRow.style.cssText = 'display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px';
+
+  const spaceBtn = document.createElement('button');
+  spaceBtn.className = 'key-btn special-key';
+  spaceBtn.textContent = 'SPACE';
+  spaceBtn.style.minWidth = '220px';
+  spaceBtn.onclick = () => typeKey(' ');
+  specialRow.appendChild(spaceBtn);
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'key-btn special-key';
+  backBtn.textContent = '← BACK';
+  backBtn.onclick = () => {
+    if (currentText.length > 0) {
+      currentText = currentText.slice(0, -1);
+      updatePaper();
+    }
+  };
+  specialRow.appendChild(backBtn);
+
+  const enterBtn = document.createElement('button');
+  enterBtn.className = 'key-btn special-key';
+  enterBtn.textContent = 'ENTER';
+  enterBtn.onclick = () => typeKey('\n');
+  specialRow.appendChild(enterBtn);
+
+  keyboard.appendChild(specialRow);
+}
+
+function updatePaper() {
+  if (paperText) {
+    paperText.textContent = currentText;
+  }
+}
+
+function openModal() {
+  clearTimeout(closeTimer);
+  if (modalOpen) return;
+  modalOpen = true;
+  currentText = '';
+  updatePaper();
+  createKeyboardUI();
+  modal.classList.add('open');
+}
+
+function closeModal() {
+  modalOpen = false;
+  modal.classList.remove('open');
+  currentText = '';
+}
+
+function typeKey(key) {
+  currentText += key;
+  updatePaper();
+
+  if (currentText.toLowerCase().trim() === 'key') {
+    setTimeout(() => {
+      if (inventory.addKey()) {
+        alert('🔑 Ключ добавлен в инвентарь!');
+      }
+      closeModal();
+    }, 120);
+  }
+}
+
+if (typewriterEl) {
+  typewriterEl.style.cursor = 'pointer';
+  typewriterEl.onclick = openModal;
+}
+
+if (closeBtn) {
+  closeBtn.onclick = closeModal;
+}
+</script>
+</body>
+</html>

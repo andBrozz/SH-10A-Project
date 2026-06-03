@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="content/img/favicon.png">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
@@ -127,17 +128,17 @@ html, body {
 <body>
 
 <div id="bg">
-  <video src="video/SHW.mp4" autoplay loop muted playsinline></video>
+  <video src="content/video/SHW.mp4" autoplay loop muted playsinline></video>
 </div>
 <div id="fade-left"></div>
 <div id="vignette"></div>
 <canvas id="grain"></canvas>
 
 <nav id="menu">
-  <div class="mi"><canvas></canvas><span>Грати</span></div>
-  <div class="mi"><canvas></canvas><span>Налаштування</span></div>
-  <div class="mi"><canvas></canvas><span>Створювачи</span></div>
-  <div class="mi"><canvas></canvas><span>Вихід</span></div>
+  <div class="mi"><canvas></canvas><span>PLAY</span></div>
+  <div class="mi"><canvas></canvas><span>SETTINGS</span></div>
+  <div class="mi"><canvas></canvas><span>CREATORS</span></div>
+  <div class="mi"><canvas></canvas><span>EXIT</span></div>
 </nav>
 
 <div id="footer">
@@ -289,6 +290,14 @@ selectItem(0);
 items.forEach((el, i) => {
   el.addEventListener('mouseenter', () => selectItem(i));
 });
+
+// Открыть мини-офис по клику на первую кнопку "Грати"
+if (items[0]) {
+  items[0].addEventListener('click', () => {
+    // Открываем относительный путь к файлу в том же окне
+    window.location.href = 'html/chained_door.html';
+  });
+}
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown') { e.preventDefault(); selectItem(sel + 1); }
