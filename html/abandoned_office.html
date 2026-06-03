@@ -1146,7 +1146,7 @@ class Inventory {
   updateUI() {
     const count = document.getElementById('inv-keys');
     if (count) {
-      count.textContent = `Ключ: ${this.keys} / ${this.maxKeys}`;
+      count.textContent = `Key: ${this.keys} / ${this.maxKeys}`;
     }
   }
 }
@@ -1250,7 +1250,7 @@ function typeKey(key) {
   if (currentText.toLowerCase().trim() === 'key') {
     setTimeout(() => {
       if (inventory.addKey()) {
-        alert('🔑 Ключ добавлен в инвентарь!');
+        alert('🔑 Key added to inventory!');
       }
       closeModal();
     }, 120);

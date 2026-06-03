@@ -136,15 +136,10 @@ html, body {
 
 <nav id="menu">
   <div class="mi"><canvas></canvas><span>PLAY</span></div>
-  <div class="mi"><canvas></canvas><span>SETTINGS</span></div>
+  <div class="mi"><canvas></canvas><span>ABOUT</span></div>
   <div class="mi"><canvas></canvas><span>CREATORS</span></div>
   <div class="mi"><canvas></canvas><span>EXIT</span></div>
 </nav>
-
-<div id="footer">
-  <span class="f-copy">© 2024 Konami Digital Entertainment</span>
-  <span class="f-ver">v. 1.1.258.834</span>
-</div>
 
 <script>'use strict';
 
@@ -261,13 +256,12 @@ function renderBtn(canvas, t) {
   ctx.strokeStyle = bGrad;
   ctx.lineWidth   = 2;
 
-  /*// Верхняя граница
+  /* 
   ctx.beginPath();
   ctx.moveTo(0, 1);
   ctx.lineTo(w, 1);
   ctx.stroke();
 
-  // Нижняя граница
   ctx.beginPath();
   ctx.moveTo(0, h - 1);
   ctx.lineTo(w, h - 1);
@@ -291,7 +285,6 @@ items.forEach((el, i) => {
   el.addEventListener('mouseenter', () => selectItem(i));
 });
 
-// Открыть мини-офис по клику на первую кнопку "Грати"
 if (items[0]) {
   items[0].addEventListener('click', () => {
     // Открываем относительный путь к файлу в том же окне
@@ -299,6 +292,26 @@ if (items[0]) {
   });
 }
 
+if (items[1]) {
+  items[1].addEventListener('click', () => {
+    alert('This project was made by andbrozz.');
+  });
+}
+
+if (items[2]) {
+  items[2].addEventListener('click', () => {
+    alert('This project is unfinished — beta version.\n\nA Silent Hill 2 inspired interactive scene showcase. Explore rooms and interact with objects.');
+  });
+}
+
+if (items[3]) {
+  items[3].addEventListener('click', () => {
+    alert('Thank you for visiting our site.');
+      window.location.href = 'chrome://newtab';
+      setTimeout(() => { window.location.href = 'https://www.google.com/'; }, 600);
+    
+  });
+}
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown') { e.preventDefault(); selectItem(sel + 1); }
   if (e.key === 'ArrowUp')   { e.preventDefault(); selectItem(sel - 1); }
