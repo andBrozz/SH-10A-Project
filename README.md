@@ -2,5 +2,5 @@
 
 Team:
 andbrozz, 
-Arina Daniielian(Enneru)
-Fantom
+Arina Daniielian(Enneru), 
+Miroslav Kovalchuck(Fantom)
